@@ -1,7 +1,7 @@
 import java.util.*;
 import java.io.*;
 
-public class C3190 {
+public class C3190_O {
 
     public static class TimeAndDirect {
         int time;
