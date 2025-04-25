@@ -8,6 +8,7 @@ public class C1406_O {
         Deque<Character> left = new ArrayDeque<>();
         Deque<Character> right = new ArrayDeque<>();
 
+        System.out.println();
         // 초기 문자열 입력
         String str = br.readLine();
         for (char c : str.toCharArray()) {
