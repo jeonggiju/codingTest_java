@@ -9,7 +9,7 @@ import java.util.Deque;
  *
  */
 
-public class C1012 {
+public class C1012_O {
 
     static void search(boolean[][] map, int startRow , int startCol){
         Deque<Integer[]> qu = new ArrayDeque<>();
