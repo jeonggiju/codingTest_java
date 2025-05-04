@@ -4,66 +4,91 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 1. DP는 아닌 듯. 그냥 아닌 것 같음
+ * 2. DFS를 쓰는데, 그냥 돌면 안될 것 같아. 왜? 이 문제는 골딱이라 그럼. 정점 최대 개수가 100,000개임.
+ *  모든 경우의 수를 다 따져서 Math.max 하면 될 것같은데 이거 아닌 것 같음
+ * 3. 조건을 달아야할 것같은데... 사이클 형태는 아닌 것 같음
+ *  가령 1에서 5까지로 간다고 하면 1->3-> 4-> 2 -> 4-> 2-> ... 4-> 5가 되니까. 그냥 한 번 방문했으면 visited true하면 되겠네. 그러면 어떻게 접근하는게 좋을까?
+ * 4. 가중치가 높은 것 순서대로 하나씩 해볼까? 조합을 해야할 것 같은데... 백트래킹을 해야하나?
+ * 5. 그려보자...
+ */
+
 public class C1167_O {
-    static class NextNode {
-        int node;
+    public static int[] visited;
+    static List<NextVertex>[] graph;
+    public static int maxValue = 0;
+    public static int[] visitedForSecond;
+
+    public static class NextVertex{
+        int nextVertex;
         int weight;
 
-        public NextNode(int vertex, int weight) {
-            this.node = vertex;
-            this.weight = weight;
+        public NextVertex(int n, int w){
+            this.nextVertex = n;
+            this.weight = w;
         }
     }
 
-    static List<NextNode>[] graph;
-    static boolean[] visited;
-    static int maxDist = 0;
-    static int farthestNode = 0;
+    public static void dfs(int currentVertex, int currentWeight) {
+        visited[currentVertex] = 1;
+        boolean isLeaf = true;
 
-    public static void dfs(int node, int dist) {
-        visited[node] = true;
-        if (dist > maxDist) {
-            maxDist = dist;
-            farthestNode = node;
-        }
+        for (NextVertex next : graph[currentVertex]) {
+            int nextVertex = next.nextVertex;
 
-        for (NextNode next : graph[node]) {
-            if (!visited[next.node]) {
-                dfs(next.node, dist + next.weight);
+            if (visited[nextVertex] == 0) {
+                isLeaf = false;
+                dfs(nextVertex, currentWeight + next.weight);
             }
         }
+
+        if (isLeaf) {
+            if (currentWeight > maxValue) {
+                maxValue = currentWeight;
+                visitedForSecond = visited.clone();
+            }
+        }
+
+        visited[currentVertex] = 0;
     }
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int V = Integer.parseInt(br.readLine());
+        int num = Integer.parseInt(br.readLine());
+        visited = new int[num];
+        graph = new ArrayList[num];
 
-        graph = new ArrayList[V + 1];  // 1-based 인덱싱
-        for (int i = 1; i <= V; i++) {
+        for(int i = 0 ; i < num ; i++){
             graph[i] = new ArrayList<>();
-        }
 
-        for (int i = 0; i < V; i++) {
             String[] inp = br.readLine().split(" ");
-            int from = Integer.parseInt(inp[0]);
 
-            int idx = 1;
-            while (!inp[idx].equals("-1")) {
-                int to = Integer.parseInt(inp[idx++]);
-                int weight = Integer.parseInt(inp[idx++]);
-                graph[from].add(new NextNode(to, weight));
+            for (int j = 1; j < inp.length - 1; j += 2){
+                int destination = Integer.parseInt(inp[j])-1;
+                int weight  = Integer.parseInt(inp[j+1]);
+
+                graph[i].add(new NextVertex(destination,weight));
             }
         }
 
-        // =========== 여기까지가 입력 받음 ==========
+        int startIdx = 0;
+        int max = Integer.MIN_VALUE;
 
-        visited = new boolean[V + 1];
-        dfs(1, 0);
+        // 간선이 제일 많은 노드 찾기
+        for(int i = 0 ; i < num ; i++){
+            int size = graph[i].size();
+            if(max < size){
+                startIdx = i;
+                max = size;
+            }
+        }
 
-        visited = new boolean[V + 1];
-        maxDist = 0;
-        dfs(farthestNode, 0);
-
-        System.out.println(maxDist);
+        dfs(startIdx, 0);
+        int result = maxValue;
+        maxValue = 0;
+        visited = visitedForSecond.clone();
+        dfs(startIdx, 0);
+        System.out.println(result+maxValue);
     }
 }
