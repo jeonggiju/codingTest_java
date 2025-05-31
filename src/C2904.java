@@ -149,10 +149,11 @@ public class C2904 {
         }
 
         int moves = 0;
+
         for (Map<Integer,Integer> curMap : numbers) {
             for (Map.Entry<Integer,Integer> element : res.entrySet()) {
                 int key = element.getKey();
-                int target = element.getValue();            // floor(sum_i exp_i / N)
+                int target = element.getValue();
                 int cur = curMap.getOrDefault(key, 0);
                 if (cur < target) {
                     moves += (target - cur);
